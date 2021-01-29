@@ -1,0 +1,38 @@
+// Import Bootstrap and its default variables
+@import '~terminal.css';
+
+:root {
+  --page-width:80%;
+  --background-color: #222225;
+  --table-highlight-color: #844445;
+  --font-color: #e8e9ed;
+  --invert-font-color: #222225;
+  --secondary-color: #a3abba;
+  --tertiary-color: #a3abba;
+  --primary-color: #62c4ff;
+  --error-color: #ff3c74;
+  --progress-bar-background: #3f3f44;
+  --progress-bar-fill: #62c4ff;
+  --code-bg-color: #3f3f44;
+  --input-style: solid;
+  --display-h1-decoration: none;
+  --global-space:10px;
+}
+
+
+.flex {
+  display: flex; /* or inline-flex */
+  justify-content: space-around;
+}
+
+.stage {
+  flex-grow: 4;
+}
+
+.keyframe-table {
+  justify-content: flex-end;
+}
+
+.highlighted {
+   background-color: var(--table-highlight-color)
+}
