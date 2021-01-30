@@ -8,16 +8,21 @@ interface Props {
 }
 
 const PRECISION = 3
+const COLS = 10
 
 const inputsFromProps = (props: Props) => {
-    const body = props.keyframes.map((kf: Keyframe, i: Number) => {
+    const b = Math.min(props.keyframes.length - COLS - 1, Math.max(0, props.currentFrame - COLS / 2))
+    const e = Math.min(props.keyframes.length - 1, b + COLS)
+    const kfs = props.keyframes.slice(b, e)
+
+    const body = kfs.map((kf: Keyframe, i: number) => {
         let classname = ""
-        if (i == props.currentFrame) {
+        if (i + b == props.currentFrame) {
             classname += " highlighted"
         }
         return (
             <tr className={classname}>
-                <td>{i}</td>
+                <td>{i + b}</td>
                 <td>{kf.cart_x.toFixed(PRECISION)}</td>
                 <td>{kf.cart_dx.toFixed(PRECISION)}</td>
                 <td>{kf.pole_omega.toFixed(PRECISION)}</td>
