@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect } from 'react';
 
 import { Result } from "./interfaces"
 import { KeyframeTable } from './components/KeyframeTable'
 import { Keyframe, KeyframesFromLines } from './keyframe';
+import { PlaybackControls } from './components/PlaybackControls';
 
 
 const INPUT = `new state,previous state,action,reward
@@ -18,11 +19,30 @@ const INPUT = `new state,previous state,action,reward
 
 type AppState = {
   keyframes: Result<Keyframe[]>
+  currentFrame: number
+  isPlaying: boolean
+  fps: number
 }
 
 export default class App extends Component<{}, AppState> {
   public state: AppState = {
-    keyframes: KeyframesFromLines(INPUT)
+    keyframes: KeyframesFromLines(INPUT),
+    currentFrame: 0,
+    isPlaying: true,
+    fps: 25
+  }
+
+  onTimeout() {
+    setTimeout(() => {
+      if (!(this.state.keyframes instanceof Error)) {
+        this.setState({ currentFrame: (this.state.currentFrame + 1) % (this.state.keyframes.length) })
+      }
+      this.onTimeout()
+    }, 1000 / this.state.fps)
+  }
+
+  componentDidMount() {
+    this.onTimeout()
   }
 
   render() {
@@ -30,7 +50,7 @@ export default class App extends Component<{}, AppState> {
     if (this.state.keyframes instanceof Error) {
       kfComponent = (<div>Error: {this.state.keyframes} </div>)
     } else {
-      kfComponent = (<KeyframeTable currentFrame={0} keyframes={this.state.keyframes} />)
+      kfComponent = (<KeyframeTable currentFrame={this.state.currentFrame} keyframes={this.state.keyframes} />)
     }
     return (
       /* Menu */
@@ -46,17 +66,30 @@ export default class App extends Component<{}, AppState> {
         </div>
         <hr />
         <div className="flex flex-direction=column">
+          {/* left column: the viz stage */}
           <div className="stage">
             <header>
               <h2>Vis</h2>
             </header>
             <div className="state"></div>
           </div>
-          <div className="container keyframe-table">
-            <header>
-              <h3>Keyframes</h3>
-            </header>
-            {kfComponent}
+          {/* right column: the keyframe table and controls */}
+          <div className="flex-direction=row">
+            <div className="keyframe-table">
+              <header>
+                <h3>Keyframes</h3>
+              </header>
+              {kfComponent}
+            </div>
+            <div className="keyframe-table">
+              <PlaybackControls
+                isPlaying={this.state.isPlaying}
+                fps={this.state.fps}
+                currentFrame={this.state.currentFrame}
+                totalFrames={8}
+                onFPSChange={(fps: number) => this.setState({ fps: fps })}
+                onFrameChange={(frame: number) => this.setState({ currentFrame: frame })} />
+            </div>
           </div>
         </div>
       </div >

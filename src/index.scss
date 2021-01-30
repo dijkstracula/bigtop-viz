@@ -20,6 +20,36 @@
 }
 
 
+input[type=range] {
+  width: 95%;
+  padding: 0.7em 0.5em;
+  font-size: 1em;
+  font-family: var(--font-stack);
+}
+
+/* https://stackoverflow.com/a/38163892 */
+
+/* chrome */
+input[type='range']::-webkit-slider-runnable-track {
+  color: var(--progress-bar-fill);
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-progress {
+  background-color: var(--progress-bar-fill); 
+}
+input[type="range"]::-moz-range-track {  
+  background-color: var(--progress-bar-background);
+}
+
+/* interwebs exploder */
+input[type="range"]::-ms-fill-lower {
+  background-color: var(--progress-bar-fill); 
+}
+input[type="range"]::-ms-fill-upper {  
+  background-color: var(--progress-bar-background);
+}
+
 .flex {
   display: flex; /* or inline-flex */
   justify-content: space-around;
