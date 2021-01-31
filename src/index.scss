@@ -2,7 +2,7 @@
 @import '~terminal.css';
 
 :root {
-  --page-width:80%;
+  --page-width:100em;
   --background-color: #222225;
   --table-highlight-color: #844445;
   --font-color: #e8e9ed;
@@ -50,17 +50,21 @@ input[type="range"]::-ms-fill-upper {
   background-color: var(--progress-bar-background);
 }
 
+.container {
+  align-items: stretch;
+}
+
+table {
+  margin: 0 0 10px 0;
+}
+
 .flex {
   display: flex; /* or inline-flex */
   justify-content: space-around;
 }
 
 .stage {
-  flex-grow: 4;
-}
-
-.keyframe-table {
-  justify-content: flex-end;
+  align-items: stretch;
 }
 
 .highlighted {

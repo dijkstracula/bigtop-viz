@@ -4,6 +4,7 @@ import { Result } from "./interfaces"
 import { KeyframeTable } from './components/KeyframeTable'
 import { Keyframe, KeyframesFromLines } from './keyframe';
 import { PlaybackControls } from './components/PlaybackControls';
+import { CartpoleStage } from './components/CartpoleStage';
 
 
 const INPUT = `new state,previous state,action,reward
@@ -87,10 +88,13 @@ export default class App extends Component<{}, AppState> {
 
   render() {
     let kfComponent;
+    let vizComponent;
     if (this.state.keyframes instanceof Error) {
       kfComponent = (<div>Error: {this.state.keyframes} </div>)
+      vizComponent = (<div></div>)
     } else {
       kfComponent = (<KeyframeTable currentFrame={this.state.currentFrame} keyframes={this.state.keyframes} />)
+      vizComponent = (<CartpoleStage kf={this.state.keyframes[this.state.currentFrame]} />)
     }
     return (
       /* Menu */
@@ -107,21 +111,15 @@ export default class App extends Component<{}, AppState> {
         <hr />
         <div className="flex flex-direction=column">
           {/* left column: the viz stage */}
-          <div className="stage">
-            <header>
-              <h2>Vis</h2>
-            </header>
-            <div className="state"></div>
+          <div className="container">
+            {vizComponent}
           </div>
           {/* right column: the keyframe table and controls */}
-          <div className="flex-direction=row">
-            <div className="keyframe-table">
-              <header>
-                <h3>Keyframes</h3>
-              </header>
+          <div className="container flex-direction=row">
+            <div className="container keyframe-table">
               {kfComponent}
             </div>
-            <div className="keyframe-table">
+            <div className="container">
               <PlaybackControls
                 isPlaying={this.state.isPlaying}
                 fps={this.state.fps}

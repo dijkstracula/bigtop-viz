@@ -14,6 +14,8 @@ interface Props {
 const MIN_FPS = 1
 const MAX_FPS = 60
 
+const BACK_BUTTON = "<"
+const FW_BUTTON = ">"
 const PAUSE_BUTTON = "Pause"
 const PLAY_BUTTON = "Play"
 
@@ -30,17 +32,33 @@ export const PlaybackControls = (props: Props) => {
                             value={props.currentFrame}
                             onChange={(e) => props.onFrameChange(e.target.valueAsNumber)} />
                     </div>
+
                     <div className="form-group">
                         <label>frames/sec: {props.fps}</label>
                         <input type="range" min={MIN_FPS} max={MAX_FPS} step="1"
                             value={props.fps}
                             onChange={(e) => props.onFPSChange(e.target.valueAsNumber)} />
                     </div>
-                    <div className="form-group">
-                        <button id="submit"
-                            className="btn btn-default btn-ghost"
-                            onClick={(_: any) => props.onPauseClick()}
-                        >{playbackButtonText}</button>
+
+                    <div className="flex flex-direction=row">
+                        <div className="form-group">
+                            <button id="submit"
+                                className="btn btn-default btn-ghost"
+                                onClick={(_: any) => props.onFrameChange(props.currentFrame - 1)}
+                            >{BACK_BUTTON}</button>
+                        </div>
+                        <div className="form-group">
+                            <button id="submit"
+                                className="btn btn-default btn-ghost"
+                                onClick={(_: any) => props.onPauseClick()}
+                            >{playbackButtonText}</button>
+                        </div>
+                        <div className="form-group">
+                            <button id="submit"
+                                className="btn btn-default btn-ghost"
+                                onClick={(_: any) => props.onFrameChange(props.currentFrame + 1)}
+                            >{FW_BUTTON}</button>
+                        </div>
                     </div>
                 </div>
             </fieldset>

@@ -11,8 +11,8 @@ const PRECISION = 3
 const COLS = 10
 
 const inputsFromProps = (props: Props) => {
-    const b = Math.min(props.keyframes.length - COLS - 1, Math.max(0, props.currentFrame - COLS / 2))
-    const e = Math.min(props.keyframes.length - 1, b + COLS)
+    const b = Math.min(props.keyframes.length - COLS, Math.max(0, props.currentFrame - COLS / 2))
+    const e = Math.min(props.keyframes.length, b + COLS)
     const kfs = props.keyframes.slice(b, e)
 
     const body = kfs.map((kf: Keyframe, i: number) => {
