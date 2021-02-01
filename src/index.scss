@@ -52,6 +52,7 @@ input[type="range"]::-ms-fill-upper {
 
 .container {
   align-items: stretch;
+  flex-shrink: 0;
 }
 
 table {

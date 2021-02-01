@@ -28,7 +28,7 @@ export const PlaybackControls = (props: Props) => {
                 <div className="playback-controls">
                     <div className="form-group">
                         <label>Frame {props.currentFrame}/{props.totalFrames} </label>
-                        <input type="range" min="0" max={props.totalFrames} step="1"
+                        <input type="range" min="0" max={props.totalFrames - 1} step="1"
                             value={props.currentFrame}
                             onChange={(e) => props.onFrameChange(e.target.valueAsNumber)} />
                     </div>
