@@ -21,7 +21,7 @@ const inputsFromProps = (props: Props) => {
             classname += " highlighted"
         }
         return (
-            <tr className={classname}>
+            <tr className={classname} key={i + b}>
                 <td>{i + b}</td>
                 <td>{kf.cart_x.toFixed(PRECISION)}</td>
                 <td>{kf.cart_dx.toFixed(PRECISION)}</td>
@@ -39,12 +39,14 @@ export const KeyframeTable = (props: Props) => {
         <div>
             <table>
                 <thead>
-                    <th>i</th>
-                    <th>x</th>
-                    <th>dx</th>
-                    <th>θ</th>
-                    <th>ω</th>
-                    <th>↔</th>
+                    <tr>
+                        <th>i</th>
+                        <th>x</th>
+                        <th>dx</th>
+                        <th>θ</th>
+                        <th>ω</th>
+                        <th>↔</th>
+                    </tr>
                 </thead>
                 {inputsFromProps(props)}
             </table>

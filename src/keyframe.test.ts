@@ -69,6 +69,20 @@ test('Constructs a correct keyframe (1)', () => {
 test('Constructs a correct keyframe (2)', () => {
     const input = [[0, -1.0, 0.1, 0.2], [0, 0, 0, 0], 1, 0];
     const output: Result<Keyframe> = KeyframeFromDataArray(input);
+    expect((output instanceof Error)).toBe(false);
+    const asKeyframe = (output as Keyframe);
+    
+    expect(asKeyframe.cart_x).toBe(0)
+    expect(asKeyframe.cart_dx).toBe(-1.0)
+    expect(asKeyframe.pole_theta).toBe(0.1)
+    expect(asKeyframe.pole_omega).toBe(0.2)
+    expect(asKeyframe.action).toBe("Right")
+    expect(asKeyframe.reward).toBe(null)
+});
+
+test('Constructs a correct keyframe with discarded 5th argument', () => {
+    const input = [[0, -1.0, 0.1, 0.2], [0, 0, 0, 0], 1, 0, 0];
+    const output: Result<Keyframe> = KeyframeFromDataArray(input);
 
     expect((output instanceof Error)).toBe(false);
     const asKeyframe = (output as Keyframe);

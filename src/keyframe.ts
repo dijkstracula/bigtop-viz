@@ -29,9 +29,12 @@ export function KeyframesFromLines(lines: string[]): Result<Keyframe[]> {
         // XXX: I hate this, but the structure is just annoying enough to be nontrivial to extract with regexen
         // but not annoying enough to extract with a parser generator.
         // TODO: confirm that we don't have control over this line format.
-        let components: string[] = line.split(",")
-        components[0] = JSON.parse(components[0].replaceAll(/\s+/g, ","))
-        components[1] = JSON.parse(components[1].replaceAll(/\s+/g, ","))
+        let components: string[] = line.split(/,\s*/)
+        if (components.length < 4) {
+            return Error(`Couldn't parse ${line}: only ${components.length} components`)
+        }
+        components[0] = JSON.parse(components[0].replace(/\s+/g, ","))
+        components[1] = JSON.parse(components[1].replace(/\s+/g, ","))
         const kf = KeyframeFromDataArray(components)
         if (kf instanceof Error) {
             return kf
@@ -51,8 +54,8 @@ export function KeyframesFromLines(lines: string[]): Result<Keyframe[]> {
  * @returns either an Error if csv is invalid, or, a Keyframe if all parameters are valid.
  */
 export function KeyframeFromDataArray(data: any[]): Result<Keyframe> {
-    if (data.length !== 4) {
-        return Error(`Expected data of length 4; got ${data.length}`)
+    if (data.length < 4 || data.length > 5) {
+        return Error(`Expected data of length 4 or 5; got ${data.length}`)
     }
     if (!Array.isArray(data[0]) || data[0].length !== 4) {
         return Error(`Expected data[0] ${data[0]} to be an array of length 4`)
@@ -60,13 +63,21 @@ export function KeyframeFromDataArray(data: any[]): Result<Keyframe> {
     if (!Array.isArray(data[1]) || data[1].length !== 4) {
         return Error(`Expected data[1] ${data[1]} to be an array of length 4`)
     }
-    if (!Number.isFinite(data[2])) {
+
+    // XXX: Number() parses an array of one value. Argh.
+
+    if (Array.isArray(data[2]) || Number(data[2]) === undefined) {
+        return Error(`Expected data[2]=${data[2]} to be a number; got ${typeof(data[2])}.`)
+    } else {
         data[2] = Number(data[2])
         if (data[2] !== 0 && data[2] !== 1) {
             return Error(`Expected data[2] ${data[2]} to be either 0 or 1.`)
         }
     }
-    if (!Number.isFinite(data[3])) {
+
+    if (Array.isArray(data[3]) || Number(data[3]) === undefined) {
+        return Error(`Expected data[3]=${data[3]} to be a number; got ${typeof(data[3])}.`)
+    } else{
         data[3] = Number(data[3])
         if (data[3] !== -1 && data[3] !== 0 && data[3] !== 1) {
             return Error(`Expected data[3] ${data[3]} to be either -1, 0, or 1.`)
