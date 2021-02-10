@@ -71,3 +71,11 @@ table {
 .highlighted {
    background-color: var(--table-highlight-color)
 }
+
+.messageBox {
+  white-space: pre-wrap;
+}
+
+.btn-disabled {
+  border-color: var(--table-highlight-color)
+}

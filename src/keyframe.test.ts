@@ -1,5 +1,5 @@
 import { Result } from "./interfaces"
-import { Keyframe, KeyframesFromLines, KeyframeFromDataArray } from "./keyframe"
+import { Keyframe, KeyframesFromLines, KeyframeFromDataArray, ChaptersFromKeyframes } from "./keyframe"
 
 const HEADER = "new state,previous state,action,reward"
 
@@ -63,7 +63,7 @@ test('Constructs a correct keyframe (1)', () => {
     expect(asKeyframe.pole_theta).toBe(0.1)
     expect(asKeyframe.pole_omega).toBe(0.2)
     expect(asKeyframe.action).toBe("Left")
-    expect(asKeyframe.reward).toBe(null)
+    expect(asKeyframe.reward).toBe(undefined)
 });
 
 test('Constructs a correct keyframe (2)', () => {
@@ -77,7 +77,7 @@ test('Constructs a correct keyframe (2)', () => {
     expect(asKeyframe.pole_theta).toBe(0.1)
     expect(asKeyframe.pole_omega).toBe(0.2)
     expect(asKeyframe.action).toBe("Right")
-    expect(asKeyframe.reward).toBe(null)
+    expect(asKeyframe.reward).toBe(undefined)
 });
 
 test('Constructs a correct keyframe with discarded 5th argument', () => {
@@ -92,7 +92,7 @@ test('Constructs a correct keyframe with discarded 5th argument', () => {
     expect(asKeyframe.pole_theta).toBe(0.1)
     expect(asKeyframe.pole_omega).toBe(0.2)
     expect(asKeyframe.action).toBe("Right")
-    expect(asKeyframe.reward).toBe(null)
+    expect(asKeyframe.reward).toBe(undefined)
 });
 
 test('Errors if header is missing', () => {
@@ -126,5 +126,27 @@ test('Constructs correct array of keyframes (1)', () => {
     expect(kf.pole_theta).toBe(0.1)
     expect(kf.pole_omega).toBe(0.2)
     expect(kf.action).toBe("Right")
-    expect(kf.reward).toBe(null)
+    expect(kf.reward).toBe(undefined)
+})
+
+test('Constructs a chapter list from an empty keyframe list', () => {
+    const input: Keyframe[] = []
+    const output = ChaptersFromKeyframes(input)
+
+    expect(output.length).toBe(0)
+})
+
+test('Constructs a chapter list from a keyframe list (length 1)', () => {
+    const input1: Keyframe[] = [
+        {cart_x: 0, cart_dx: 0, pole_theta: 0, pole_omega: 0, action: "Left"}
+    ]
+    const input2: Keyframe[] = [
+        {cart_x: 0, cart_dx: 0, pole_theta: 0, pole_omega: 0, action: "Left", reward: 1}
+    ]
+
+    const output1 = ChaptersFromKeyframes(input1)
+    expect(output1.length).toBe(1)
+
+    const output2 = ChaptersFromKeyframes(input1)
+    expect(output2.length).toBe(1)
 })

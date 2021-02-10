@@ -4,6 +4,7 @@ export type Action = "Left" | "Right"
 
 export type Reward = -1 | 1
 
+export type Chapter = number
 export interface Keyframe {
     cart_x: number;     /* range: [-4,8, 4.8] */
     cart_dx: number;    /* range: [-Inf, Inf] */
@@ -19,6 +20,28 @@ const MIN_CART_X = -4.8
 const MAX_CART_X = 4.8
 const MIN_POLE_THETA = -0.418
 const MAX_POLE_THETA = 0.418
+
+/**
+ * Extracts the frames that correspond to the beginning of each chapter (that is, the frame that follows
+ * a reward being given to the agent)
+ * @param kfs the keyframes
+ */
+export function ChaptersFromKeyframes(kfs: Keyframe[]): Chapter[] {
+    var ret: Chapter[] = []
+
+    if (kfs.length == 0) {
+        return ret
+    }
+    ret.push(0)
+
+    kfs.forEach((v, i) => {
+        if (v.reward !== undefined && i < kfs.length) {
+            ret.push(i+1)
+        }
+    })
+
+    return ret
+}
 
 export function KeyframesFromLines(lines: string[]): Result<Keyframe[]> {
     let keyframes: Keyframe[] = []
@@ -114,7 +137,7 @@ export function KeyframeFromDataArray(data: any[]): Result<Keyframe> {
 
     const action: Action = data[2] === 0 ? "Left" : "Right"
 
-    let reward = null
+    let reward = undefined
     if (data[3] !== 0) {
         reward = data[3]
     }

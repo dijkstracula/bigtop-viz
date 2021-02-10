@@ -9,11 +9,14 @@ interface Props {
     onFPSChange: (fps: number) => void
     onFrameChange: (frame: number) => void
     onPauseClick: () => void
+    onChapterChange: (offset: number) => void
 }
 
 const MIN_FPS = 1
 const MAX_FPS = 60
 
+const PREV_CHAPTER = "<<"
+const NEXT_CHAPTER = ">>"
 const BACK_BUTTON = "<"
 const FW_BUTTON = ">"
 const PAUSE_BUTTON = "Pause"
@@ -44,7 +47,13 @@ export const PlaybackControls = (props: Props) => {
                         <div className="form-group">
                             <button id="submit"
                                 className="btn btn-default btn-ghost"
-                                onClick={(_: any) => props.onFrameChange(props.currentFrame - 1)}
+                                onClick={(_: any) => props.onChapterChange(-1)}
+                            >{PREV_CHAPTER}</button>
+                        </div>
+                        <div className="form-group">
+                            <button id="submit"
+                                className="btn btn-default btn-ghost"
+                                onClick={(_: any) => props.onFrameChange(((props.currentFrame + props.totalFrames) - 1) % (props.totalFrames - 1))}
                             >{BACK_BUTTON}</button>
                         </div>
                         <div className="form-group">
@@ -56,12 +65,18 @@ export const PlaybackControls = (props: Props) => {
                         <div className="form-group">
                             <button id="submit"
                                 className="btn btn-default btn-ghost"
-                                onClick={(_: any) => props.onFrameChange(props.currentFrame + 1)}
+                                onClick={(_: any) => props.onFrameChange(props.currentFrame + 1 % (props.totalFrames - 1))}
                             >{FW_BUTTON}</button>
+                        </div>
+                        <div className="form-group">
+                            <button id="submit"
+                                className="btn btn-default btn-ghost"
+                                onClick={(_: any) => props.onChapterChange(1)}
+                            >{NEXT_CHAPTER}</button>
                         </div>
                     </div>
                 </div>
             </fieldset>
-        </form>
+        </form >
     )
 }

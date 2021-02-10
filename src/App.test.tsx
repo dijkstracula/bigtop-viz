@@ -6,8 +6,9 @@ import App from './App';
 
 test('renders header', () => {
   render(<App />);
-  const linkElement = screen.getByText(/bigtop/i);
-  expect(linkElement).toBeInTheDocument();
+  const linkElement = screen.getAllByText(/bigtop/i);
+  expect(linkElement.length).toBeGreaterThan(0);
+  expect(linkElement[0]).toBeInTheDocument();
 });
 
 it('renders without crashing', () => {

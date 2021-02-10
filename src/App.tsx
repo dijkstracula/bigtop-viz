@@ -1,10 +1,12 @@
-import React, { Component, useEffect } from 'react';
+import React, { Component } from 'react';
+import { le } from 'binary-search-bounds';
 
 import { Result } from "./interfaces"
 import { KeyframeTable } from './components/KeyframeTable'
-import { Keyframe, KeyframesFromLines } from './keyframe';
+import { ChaptersFromKeyframes, Keyframe, KeyframesFromLines } from './keyframe';
 import { PlaybackControls } from './components/PlaybackControls';
 import { CartpoleStage } from './components/CartpoleStage';
+import { MessageBar } from './components/MessageBar';
 
 const INPUT = `new state,previous state,action,reward
 [0.011347046974051981 -0.15130313186528035 0.016331433696223002 0.2916006514062464],[0.010466028797961956 0.04405090880450124 0.016456005321849043 -0.006228581281301979],0,0.000000
@@ -111,81 +113,107 @@ const INPUT = `new state,previous state,action,reward
 
 type AppState = {
   keyframes: Result<Keyframe[]>
+  chapters: number[]
   currentFrame: number
   isPlaying: boolean
   fps: number
+  msg: string
 }
 
 export default class App extends Component<{}, AppState> {
   public state: AppState = {
-    keyframes: KeyframesFromLines(INPUT),
+    keyframes: Error("Loading"),
+    chapters: [],
     currentFrame: 0,
     isPlaying: true,
-    fps: 25
+    fps: 25,
+    msg: "Welcome to Bigtop."
   }
 
   onTimeout() {
     setTimeout(() => {
       if (this.state.isPlaying && !(this.state.keyframes instanceof Error)) {
-        this.setState({ currentFrame: (this.state.currentFrame + 1) % (this.state.keyframes.length - 1) })
+        const nextFrameIdx = (this.state.currentFrame + 1) % (this.state.keyframes.length - 1)
+        const nextFrame = this.state.keyframes[nextFrameIdx]
+
+        if (nextFrame.reward !== undefined) {
+          const msg = `Reward of ${nextFrame.reward} on frame ${nextFrameIdx}`
+          this.setState({ msg: msg })
+        }
+
+        this.setState({ currentFrame: nextFrameIdx })
         this.onTimeout()
       }
     }, 1000 / this.state.fps)
   }
 
   componentDidMount() {
-    this.onTimeout()
+    const kfs = KeyframesFromLines(INPUT)
+    if (!(kfs instanceof Error)) {
+      const chps = ChaptersFromKeyframes(kfs)
+      this.setState({ keyframes: kfs, chapters: chps })
+      this.onTimeout()
+    }
   }
 
   render() {
-    let kfComponent;
-    let vizComponent;
+    let vizComponents;
     if (this.state.keyframes instanceof Error) {
-      return (<div>Error: {this.state.keyframes} </div>)
+      vizComponents = <div>Error: {this.state.keyframes.message} </div>
     } else {
-      return (
-        /* Menu */
+      vizComponents = <div className="container flex flex-direction=column">
+        {/* left column: the viz stage */}
+        <div className="">
+          <CartpoleStage kf={this.state.keyframes[this.state.currentFrame]} />
+        </div>
+        {/* right column: the keyframe table and controls */}
         <div className="container flex-direction=row">
-          <div className="terminal-nav">
-            <header className="terminal-logo">Bigtop</header>
-            <nav className="terminal-menu">
-              <ul vocab="https://schema.org" typeof="BreadcrumbList">
-                <li><a href="#">About</a></li>
-                <li><a href="#">Upload</a></li>
-              </ul>
-            </nav>
+          <div className="container keyframe-table">
+            <KeyframeTable currentFrame={this.state.currentFrame} keyframes={this.state.keyframes} />
           </div>
-          <hr />
-          <div className="container flex flex-direction=column">
-            {/* left column: the viz stage */}
-            <div className="">
-              <CartpoleStage kf={this.state.keyframes[this.state.currentFrame]} />
-              {vizComponent}
-            </div>
-            {/* right column: the keyframe table and controls */}
-            <div className="container flex-direction=row">
-              <div className="container keyframe-table">
-                <KeyframeTable currentFrame={this.state.currentFrame} keyframes={this.state.keyframes} />
-              </div>
-              <div className="container">
-                <PlaybackControls
-                  isPlaying={this.state.isPlaying}
-                  fps={this.state.fps}
-                  currentFrame={this.state.currentFrame}
-                  totalFrames={this.state.keyframes.length}
-                  onFPSChange={(fps: number) => this.setState({ fps: fps })}
-                  onFrameChange={(frame: number) => {
-                    this.setState({ currentFrame: frame, isPlaying: false })
-                  }}
-                  onPauseClick={() => {
-                    this.setState({ isPlaying: !this.state.isPlaying })
-                    this.onTimeout()
-                  }} />
-              </div>
-            </div>
+          <div className="container">
+            <PlaybackControls
+              isPlaying={this.state.isPlaying}
+              fps={this.state.fps}
+              currentFrame={this.state.currentFrame}
+              totalFrames={this.state.keyframes.length}
+              onFPSChange={(fps: number) => this.setState({ fps: fps })}
+              onFrameChange={(frame: number) => {
+                this.setState({ currentFrame: frame, isPlaying: false, msg: "" })
+              }}
+              onPauseClick={() => {
+                this.setState({ isPlaying: !this.state.isPlaying })
+                this.onTimeout()
+              }}
+              onChapterChange={(offset: number) => {
+                if (!(this.state.keyframes instanceof Error)) {
+                  let chIdx = le(this.state.chapters, this.state.currentFrame)
+                  chIdx = (chIdx + this.state.chapters.length + offset) % (this.state.chapters.length)
+                  this.setState({ currentFrame: this.state.chapters[chIdx], msg: "" })
+                }
+              }}
+            />
           </div>
-        </div >
-      );
+        </div>
+      </div>
     }
+
+    return (
+      /* Menu */
+      <div className="container flex-direction=row">
+        <div className="terminal-nav">
+          <header className="terminal-logo">Bigtop</header>
+          <nav className="terminal-menu">
+            <ul vocab="https://schema.org" typeof="BreadcrumbList">
+              <li><a href="#">About</a></li>
+              <li><a href="#">Upload</a></li>
+            </ul>
+          </nav>
+        </div>
+        <hr />
+        {vizComponents}
+        <MessageBar msg={this.state.msg} />
+      </div >
+    );
   }
 };
