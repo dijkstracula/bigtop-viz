@@ -158,8 +158,13 @@ export default class App extends Component<{}, AppState> {
 
   render() {
     let vizComponents;
+
     if (this.state.keyframes instanceof Error) {
       vizComponents = <div>Error: {this.state.keyframes.message} </div>
+    } else if (this.state.keyframes?.length === 0) {
+      vizComponents = <div>
+        <h1>{WELCOME_MSG}</h1>
+      </div>
     } else {
       vizComponents = <div className="container flex flex-direction=column">
         {/* left column: the viz stage */}
