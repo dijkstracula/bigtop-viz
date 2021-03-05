@@ -45,16 +45,27 @@ export function ChaptersFromKeyframes(kfs: Keyframe[]): Chapter[] {
 
 export function KeyframesFromLines(lines: string[]): Result<Keyframe[]> {
     let keyframes: Keyframe[] = []
-    if (lines[0] !== "new state,previous state,action,reward") {
-        return Error("Unknown header")
+
+    /* First, parse the header. */
+    let headerFields: string[] = lines[0].split(/,\s*/)
+    if (headerFields.length < 5 || headerFields.length > 6) {
+        return Error(`Couldn't parse file header "${lines[0]}": Expected 5 or 6 columns but got ${headerFields.length} instead`)
     }
-    for (const line of lines.slice(1)) {
+
+    /* XXX: slightly more ceremonious than just mapping directly, but the early return
+     * makes that difficult. */
+    for (const {line, idx} of lines.slice(1).map((line, idx) => ({line,idx}))) {
         // XXX: I hate this, but the structure is just annoying enough to be nontrivial to extract with regexen
         // but not annoying enough to extract with a parser generator.
         // TODO: confirm that we don't have control over this line format.
+
+        if (line.length == 0) {
+            continue
+        }
+
         let components: string[] = line.split(/,\s*/)
         if (components.length < 4) {
-            return Error(`Couldn't parse ${line}: only ${components.length} components`)
+            return Error(`Line ${idx + 2}: Couldn't parse "${line}": only ${components.length} components`)
         }
         components[0] = JSON.parse(components[0].replace(/\s+/g, ","))
         components[1] = JSON.parse(components[1].replace(/\s+/g, ","))
@@ -77,8 +88,8 @@ export function KeyframesFromLines(lines: string[]): Result<Keyframe[]> {
  * @returns either an Error if csv is invalid, or, a Keyframe if all parameters are valid.
  */
 export function KeyframeFromDataArray(data: any[]): Result<Keyframe> {
-    if (data.length < 4 || data.length > 5) {
-        return Error(`Expected data of length 4 or 5; got ${data.length}`)
+    if (data.length < 4 ) {
+        return Error(`Expected data of minimum length 4; got ${data.length}`)
     }
     if (!Array.isArray(data[0]) || data[0].length !== 4) {
         return Error(`Expected data[0] ${data[0]} to be an array of length 4`)

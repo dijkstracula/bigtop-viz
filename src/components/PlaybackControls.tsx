@@ -40,38 +40,56 @@ export const PlaybackControls = (props: Props) => {
                         <label>frames/sec: {props.fps}</label>
                         <input type="range" min={MIN_FPS} max={MAX_FPS} step="1"
                             value={props.fps}
-                            onChange={(e) => props.onFPSChange(e.target.valueAsNumber)} />
+                            onChange={(e) => {
+                                e.preventDefault()
+                                props.onFPSChange(e.target.valueAsNumber)
+                            }} />
                     </div>
 
                     <div className="flex flex-direction=row">
                         <div className="form-group">
                             <button id="submit"
                                 className="btn btn-default btn-ghost"
-                                onClick={(_: any) => props.onChapterChange(-1)}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    props.onChapterChange(-1)
+                                }}
                             >{PREV_CHAPTER}</button>
                         </div>
                         <div className="form-group">
                             <button id="submit"
                                 className="btn btn-default btn-ghost"
-                                onClick={(_: any) => props.onFrameChange(((props.currentFrame + props.totalFrames) - 1) % (props.totalFrames - 1))}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    props.onFrameChange(((props.currentFrame + props.totalFrames) - 1) % (props.totalFrames - 1))
+                                }}
                             >{BACK_BUTTON}</button>
                         </div>
                         <div className="form-group">
                             <button id="submit"
                                 className="btn btn-default btn-ghost"
-                                onClick={(_: any) => props.onPauseClick()}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    props.onPauseClick()
+                                }}
                             >{playbackButtonText}</button>
                         </div>
                         <div className="form-group">
                             <button id="submit"
                                 className="btn btn-default btn-ghost"
-                                onClick={(_: any) => props.onFrameChange(props.currentFrame + 1 % (props.totalFrames - 1))}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    props.onFrameChange(props.currentFrame + 1 % (props.totalFrames - 1))
+                                }}
                             >{FW_BUTTON}</button>
                         </div>
                         <div className="form-group">
                             <button id="submit"
                                 className="btn btn-default btn-ghost"
-                                onClick={(_: any) => props.onChapterChange(1)}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    props.onChapterChange(1)
+                                }}
                             >{NEXT_CHAPTER}</button>
                         </div>
                     </div>
